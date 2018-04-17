@@ -1,0 +1,4 @@
+name = Data Catalog Add
+description = Provides a User Interface to perform POST on Data Catalog REST Web Services
+package = Data-Catalog
+core = 7.x

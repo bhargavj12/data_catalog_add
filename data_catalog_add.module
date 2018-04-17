@@ -1,0 +1,160 @@
+<?php
+
+function data_catalog_add_menu(){
+	$items['node/7'] = array(
+	'title' => 'New Catalog Entry',
+	'description' => 'N/a',
+	'page callback' => 'drupal_get_form',
+	'page arguments' => array('_data_catalog_add_instance_form'),
+	'access callback' => TRUE,
+);
+	
+	return $items;
+		
+}
+
+
+function _data_catalog_add_instance_form($form, &$form_submit) {
+	
+	//Creating a Form 
+	$dateformat = 'm/d/Y';
+	$date = '04/01/2018';
+	
+	$form['id'] = array(
+    '#title' => t('Id'),
+	'#type' => 'textfield',
+	);
+    
+	$form['instance_id'] = array(
+    '#title' => t('Instance Id'),
+	'#type' => 'textfield',
+    );
+	
+	$form['instance_type'] = array(
+	'#title' => t('Instance Type'),
+	'#type' => 'textfield',
+    );
+	
+	$form['instance_owner'] = array(
+	'#title' => t('Instance Owner'),
+	'#type' => 'textfield',
+    );
+	
+	$form['expiration_datec'] = array(
+	'#title' => t('Expiration Date'),
+	//'#type' => 'textfield',
+	
+	  '#type' => 'date',
+      
+      //'#date_format' => $dateformat,
+      '#date_year_range' => '-3:+3',
+      //'#default_value' => $date,
+     
+	);
+	
+	$form['termination_datec'] = array(
+	'#title' => t('Termination Date'),
+	'#type' => 'textfield',
+	);
+	
+	$form['purpose'] = array(
+	'#title' => t('Purpose'),
+	'#type' => 'textfield',
+	);
+	
+	$form['project'] = array(
+	'#title' => t('Project'),
+	'#type' => 'textfield',
+	);
+	
+	$form['environment'] = array(
+	'#title' => t('Environment'),
+	'#type' => 'textfield',
+	);
+	
+	$form['ip_address'] = array(
+	'#title' => t('IP Address'),
+	'#type' => 'textfield',
+	);
+	
+	$form['ip_public'] = array(
+	'#title' => t('IP Public'),
+	'#type' => 'textfield',
+	);
+	
+	$form['key_name'] = array(
+	'#title' => t('Key Name'),
+	'#type' => 'textfield',
+	);
+	
+	$form['cloud'] = array(
+	'#title' => t('Cloud'),
+	'#type' => 'textfield',
+	);
+	
+	$form['status'] = array(
+	'#title' => t('Status'),
+	'#type' => 'radios',
+	'#options' => array(
+					'Active' => t('Active'),
+					'Stopped' => t('Stopped'),
+					'Terminated' => t('Terminated'),
+					),
+	);
+	  
+	$form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Submit',
+	'#submit' => array('data_catalog_add_submit_handler'),
+	);
+  
+  
+
+  return $form;
+  
+}
+
+function data_catalog_add_submit_handler($form, &$form_state)
+{
+  $submit_values = array(
+		
+	'id' => $form_state['values']['id'],
+	'instance_id' => $form_state['values']['instance_id'],
+	'instance_type' => $form_state['values']['instance_type'],
+	'instance_owner' => $form_state['values']['instance_owner'],
+	'expiration_datec' => $form_state['values']['expiration_datec'],
+	'termination_datec' => $form_state['values']['termination_datec'],
+	'purpose' => $form_state['values']['purpose'],
+	'project' => $form_state['values']['project'],
+	'environment' => $form_state['values']['environment'],
+	'ip_address' => $form_state['values']['ip_address'],
+	'ip_public' => $form_state['values']['ip_public'],
+	'key_name' => $form_state['values']['key_name'],
+	'cloud' => $form_state['values']['cloud'],
+	'status' => $form_state['values']['status'],
+  );
+
+  $options = array(
+    'headers' => array(
+      'Content-Type:application/json',
+     ),
+     'method' => 'POST',
+    'data'=> drupal_json_encode($submit_values),
+  );
+
+  $url = 'http://dev-api.sidgs.net:9002/bhargav-npi';
+
+  $response = drupal_http_request($url, $options);
+
+  if(isset ($response->data))
+  {
+    $json_response = drupal_json_decode($response->data);
+
+    if($json_response['success'] == "success")
+      drupal_set_message(t("Form was submitted successfully"), 'status', FALSE);
+    else if ($json_response['error'] == "error")
+      drupal_set_message(t("Form was not submitted successfully. Please try after some time."), 'error', FALSE);
+  
+ 
+  }
+}
